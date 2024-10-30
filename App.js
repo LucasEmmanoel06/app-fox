@@ -31,9 +31,11 @@ export default function App() {
     <PaperProvider>
       <View style={styles.container}>
         <Text style={styles.title}>Imagens Aleatórias de Raposas</Text>
-        {loading && <ActivityIndicator size="large" color="#0000ff" />}
-        {error && <Text style={styles.error}>{error}</Text>}
-        {foxImageUrl && !loading && <Image source={{ uri: foxImageUrl }} style={styles.image} />}
+        <View style={styles.imageContainer}>
+          {loading && <ActivityIndicator size="large" color="#0000ff" />}
+          {error && <Text style={styles.error}>{error}</Text>}
+          {foxImageUrl && !loading && <Image source={{ uri: foxImageUrl }} style={styles.image} />}
+        </View>
         <Button mode="contained" onPress={fetchFoxImage} style={styles.button}>
           Sortear nova Imagem
         </Button>
@@ -57,6 +59,14 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
+  },
+  imageContainer: {
+    width: 300,
+    height: 300,
+    margin: 20,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   image: {
     width: 300,

@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Image, ActivityIndicator } from 'react-native';
+import { Alert, StyleSheet, Text, View, Image, ActivityIndicator } from 'react-native';
 import { Button, Provider as PaperProvider } from 'react-native-paper';
+import * as FileSystem from 'expo-file-system';
+import * as MediaLibrary from 'expo-media-library';
 
 export default function App() {
   const [foxImageUrl, setFoxImageUrl] = useState(null);
@@ -23,6 +25,32 @@ export default function App() {
     }
   };
 
+  const downloadImage = async () => {
+    if (!foxImageUrl) return;
+
+    try {
+      // Solicitar permissão para acessar a mídia
+      const { status } = await MediaLibrary.requestPermissionsAsync();
+      if (status !== 'granted') {
+        Alert('Permissão para acessar a galeria é necessária!');
+        return;
+      }
+
+      // Baixar a imagem
+      const fileUri = FileSystem.documentDirectory + 'fox.jpg';
+      const { uri } = await FileSystem.downloadAsync(foxImageUrl, fileUri);
+
+      // Salvar a imagem na galeria
+      const asset = await MediaLibrary.createAssetAsync(uri);
+      await MediaLibrary.createAlbumAsync('app-fox', asset, false);
+
+      Alert.alert('Sucesso', 'Imagem salva na galeria!');
+    } catch (error) {
+      console.error('Erro ao baixar a imagem:', error);
+      Alert.alert('Erro ao baixar a imagem');
+    }
+  };
+
   useEffect(() => {
     fetchFoxImage();
   }, []);
@@ -39,6 +67,11 @@ export default function App() {
         <Button mode="contained" onPress={fetchFoxImage} style={styles.button}>
           Sortear nova Imagem
         </Button>
+        {foxImageUrl && (
+          <Button mode="contained" onPress={downloadImage} style={styles.button}>
+            Baixar Imagem
+          </Button>
+        )}
         <StatusBar style="auto" />
         <Text style={styles.footer}>Powered by randomfox.ca</Text>
         <Text style={styles.footer}>App by Lucas Albuquerque</Text>

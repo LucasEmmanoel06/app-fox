@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { Alert, StyleSheet, Text, View, Image, ActivityIndicator } from 'react-native';
+import { Alert, StyleSheet, Modal, Text, View, Image, ActivityIndicator, Pressable } from 'react-native';
 import { Button, Provider as PaperProvider } from 'react-native-paper';
 import * as FileSystem from 'expo-file-system';
 import * as MediaLibrary from 'expo-media-library';
@@ -51,6 +51,8 @@ export default function App() {
     }
   };
 
+  const [modalVisible, setModalVisible] = useState(false);
+
   useEffect(() => {
     fetchFoxImage();
   }, []);
@@ -58,12 +60,33 @@ export default function App() {
   return (
     <PaperProvider>
       <View style={styles.container}>
+
+      <Modal
+          // animação de fade
+          animationType="fade"
+          backgroundColor="rgba(0, 0, 0, 0.5)"
+          transparent={true}
+          visible={modalVisible}
+          // faz o modal fechar com o botão de voltar do Android
+          onRequestClose={() => {
+            setModalVisible(!modalVisible);
+          }}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalText}>Hello World!</Text>
+              <Pressable
+                style={[styles.button, styles.buttonClose]}
+                onPress={() => setModalVisible(!modalVisible)}>
+                <Text style={styles.textStyle}>Hide Modal</Text>
+              </Pressable>
+            </View>
+        </Modal>
+
         <Text style={styles.title}>Imagens Aleatórias de Raposas</Text>
-        <View style={styles.imageContainer}>
+        <Pressable style={styles.imageContainer} onPress={() => setModalVisible(!modalVisible)}>
           {loading && <ActivityIndicator size="large" color="#0000ff" />}
           {error && <Text style={styles.error}>{error}</Text>}
           {foxImageUrl && !loading && <Image source={{ uri: foxImageUrl }} style={styles.image} />}
-        </View>
+        </Pressable>
         <Button mode="contained" onPress={fetchFoxImage} style={styles.button}>
           Sortear nova Imagem
         </Button>
